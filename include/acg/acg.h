@@ -75,7 +75,13 @@ struct EmptyStepFunc {
 };
 
 class ACG {
+ private:
+  float fps_ = 60.0f;
+
  public:
+  void setFPS(double fps) { fps_ = fps; }
+  double getFPS() const { return fps_; }
+
   template <typename StepFunc = EmptyStepFunc>
   void run(b2World& world, StepFunc&& step_func = EmptyStepFunc()) {
     // Setup window
@@ -160,7 +166,7 @@ class ACG {
     world.SetDebugDraw(&debugDraw);
 
     // Simulation
-    float timeStep = 1.0f / 60.0f;
+    float timeStep = 1.0f / fps_;
     int32 velocityIterations = 6;
     int32 positionIterations = 2;
 
