@@ -1,9 +1,10 @@
 #include <acg/acg.h>
+#include <acg/world.h>
 
 #include <iostream>
 
 int main(int, char**) {
-  b2World world(b2Vec2(0.0f, -10.0f));
+  acg::World world(b2Vec2(0.0f, -10.0f));
 
   // Ground body
   b2BodyDef groundBodyDef;
