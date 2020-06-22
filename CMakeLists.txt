@@ -21,5 +21,5 @@ target_include_directories(acg INTERFACE include)
 target_link_libraries(acg INTERFACE box2d_draw)
 
 # Examples
-add_executable(hello examples/hello.cpp)
-target_link_libraries(hello PRIVATE acg)
+add_executable(falling_circle_with_wind examples/falling_circle_with_wind.cpp)
+target_link_libraries(falling_circle_with_wind PRIVATE acg)
