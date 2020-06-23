@@ -1,4 +1,6 @@
 #include <acg/acg.h>
+#include <acg/body_def.h>
+#include <acg/fixture_def.h>
 #include <acg/world.h>
 
 #include <iostream>
@@ -7,9 +9,8 @@ int main(int, char**) {
   acg::World world(b2Vec2(0.0f, -10.0f));
 
   // Ground body
-  b2BodyDef groundBodyDef;
-  groundBodyDef.position.Set(0.0f, -10.0f);
-  b2Body* groundBody = world.CreateBody(&groundBodyDef);
+  b2Body* groundBody =
+      world.CreateBody(acg::BodyDef().type(b2_staticBody).position({0.0f, -10.0f}).get());
 
   // Ground fixture
   b2PolygonShape groundBox;
@@ -17,20 +18,14 @@ int main(int, char**) {
   groundBody->CreateFixture(&groundBox, 0.0f);
 
   // Dynamic body
-  b2BodyDef bodyDef;
-  bodyDef.type = b2_dynamicBody;
-  bodyDef.position.Set(0.0f, 40.0f);
-  b2Body* body = world.CreateBody(&bodyDef);
+  b2Body* body =
+      world.CreateBody(acg::BodyDef().type(b2_dynamicBody).position({0.0f, 40.0f}).get());
 
   // Dynamic body fixture
   b2CircleShape dynamicCircle;
   dynamicCircle.m_radius = 1.0f;
-  b2FixtureDef fixtureDef;
-  fixtureDef.shape = &dynamicCircle;
-  fixtureDef.density = 1.0f;
-  fixtureDef.friction = 0.3f;
 
-  body->CreateFixture(&fixtureDef);
+  body->CreateFixture(acg::FixtureDef().shape(&dynamicCircle).density(1.0f).friction(0.3f).get());
 
   auto print_state = [&body] {
     body->ApplyForceToCenter(b2Vec2(1.0f, 0), true);
