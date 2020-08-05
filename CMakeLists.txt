@@ -15,11 +15,14 @@ endif()
 add_subdirectory(utils/imgui_impl)
 add_subdirectory(utils/box2d_draw)
 
-#
 add_library(acg INTERFACE)
 target_include_directories(acg INTERFACE include)
 target_link_libraries(acg INTERFACE box2d_draw)
 
 # Examples
-add_executable(falling_circle_with_wind examples/falling_circle_with_wind.cpp)
-target_link_libraries(falling_circle_with_wind PRIVATE acg)
+macro(add_example name)
+  add_executable(${name} examples/${name}.cpp)
+  target_link_libraries(${name} PRIVATE acg)
+endmacro()
+
+add_example(falling_circle_with_wind)
