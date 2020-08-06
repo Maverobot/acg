@@ -10,7 +10,7 @@ int main(int, char**) {
 
   // Ground body
   b2Body* groundBody =
-      world.CreateBody(acg::BodyDef().type(b2_staticBody).position({0.0f, -10.0f}).get());
+      world.CreateBody(acg::BodyDef().type(b2_staticBody).position({0.0f, -10.0f}));
 
   // Ground fixture
   b2PolygonShape groundBox;
@@ -18,14 +18,13 @@ int main(int, char**) {
   groundBody->CreateFixture(&groundBox, 0.0f);
 
   // Dynamic body
-  b2Body* body =
-      world.CreateBody(acg::BodyDef().type(b2_dynamicBody).position({0.0f, 40.0f}).get());
+  b2Body* body = world.CreateBody(acg::BodyDef().type(b2_dynamicBody).position({0.0f, 40.0f}));
 
   // Dynamic body fixture
   b2CircleShape dynamicCircle;
   dynamicCircle.m_radius = 1.0f;
 
-  body->CreateFixture(acg::FixtureDef().shape(&dynamicCircle).density(1.0f).friction(0.3f).get());
+  body->CreateFixture(acg::FixtureDef().shape(&dynamicCircle).density(1.0f).friction(0.3f));
 
   auto print_state = [&body] {
     body->ApplyForceToCenter(b2Vec2(1.0f, 0), true);

@@ -26,6 +26,8 @@ struct BodyDef {
 
   b2BodyDef* get() { return &def_; }
 
+  operator b2BodyDef const *() const { return &def_; }
+
  private:
   b2BodyDef def_;
 };

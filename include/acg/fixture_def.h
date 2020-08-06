@@ -18,6 +18,8 @@ struct FixtureDef : public b2FixtureDef {
 
   b2FixtureDef* get() { return &def_; }
 
+  operator b2FixtureDef const *() const { return &def_; }
+
  private:
   b2FixtureDef def_;
 };
