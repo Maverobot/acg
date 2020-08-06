@@ -27,4 +27,4 @@
   }                                                         \
   const auto& name() const noexcept { /* NOLINT */          \
     return this->mem.name;                                  \
-  }\
+  }
