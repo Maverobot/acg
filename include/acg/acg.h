@@ -4,7 +4,9 @@
 #include <functional>
 
 #include <chrono>
+#include <filesystem>
 #include <thread>
+#include <vector>
 
 #include <box2d/box2d.h>
 
@@ -66,6 +68,21 @@ namespace {
 void glfw_error_callback(int error, const char* description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
+std::string expand_user(std::string path) {
+  if (not path.empty() and path[0] == '~') {
+    assert(path.size() == 1 or path[1] == '/');  // or other error handling
+    char const* home = getenv("HOME");
+    if (home or ((home = getenv("USERPROFILE")))) {
+      path.replace(0, 1, home);
+    } else {
+      char const *hdrive = getenv("HOMEDRIVE"), *hpath = getenv("HOMEPATH");
+      assert(hdrive);  // or other error handling
+      assert(hpath);
+      path.replace(0, 1, std::string(hdrive) + hpath);
+    }
+  }
+  return path;
+}
 }  // namespace
 
 namespace acg {
@@ -73,6 +90,35 @@ namespace acg {
 struct EmptyStepFunc {
   void operator()(){};
 };
+
+void setupFonts() {
+  std::vector<std::string> fonts_paths{
+      "~/.fonts/Monaco-Linux.ttf",
+      "~/.fonts/FiraCode-Regular.ttf",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+  };
+
+  const float kDefaultFontSize = 18.0f;
+  const char* const kScalingEnvVar("GDK_SCALE");
+  float font_size_scaling = 1.0f;
+  if (const char* env_scale = std::getenv(kScalingEnvVar)) {
+    try {
+      font_size_scaling = std::stof(env_scale);
+    } catch (const std::invalid_argument& ex) {
+      printf("Warning: the environment variable %s has invalid value %s\n", kScalingEnvVar,
+             env_scale);
+    }
+  }
+
+  for (const auto& font_path : fonts_paths) {
+    auto expanded_path = expand_user(font_path);
+    if (std::filesystem::exists(expanded_path)) {
+      ImGui::GetIO().Fonts->AddFontFromFileTTF(expanded_path.c_str(),
+                                               kDefaultFontSize * font_size_scaling);
+      break;
+    }
+  }
+}
 
 class ACG {
  private:
@@ -141,9 +187,11 @@ class ACG {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+    setupFonts();
+
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard
+    // Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
@@ -242,6 +290,6 @@ class ACG {
     glfwDestroyWindow(mainWindow);
     glfwTerminate();
   };
-};
+};  // namespace acg
 
 }  // namespace acg
