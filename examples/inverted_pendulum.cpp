@@ -5,12 +5,58 @@
 
 #include <iostream>
 
+void addLink(
+    acg::World& world,
+    b2Body* parent,
+    b2Vec2 joint_local_pos,
+    float link_width,
+    float link_length,
+    std::function<void(b2Body* const&, b2RevoluteJoint* const&)> link_joint_callback = nullptr,
+    bool enable_motor = false,
+    bool enable_limit = false) {
+  // Link1
+  b2PolygonShape shape;
+  shape.SetAsBox(link_width / 2, link_length / 2, b2Vec2(0.0f, link_length / 2), 0.0f);
+
+  b2BodyDef bd;
+  bd.type = b2_dynamicBody;
+  bd.position = parent->GetWorldPoint(joint_local_pos);
+  b2Body* link = world.CreateBody(&bd);
+  link->CreateFixture(acg::FixtureDef().shape(&shape).density(5.0f));
+
+  // joint1
+  b2RevoluteJointDef jd;
+  jd.Initialize(parent, link, bd.position);
+  jd.motorSpeed = 0.1;
+  jd.maxMotorTorque = 10000.0f;
+  jd.enableMotor = enable_motor;
+  jd.enableLimit = enable_limit;
+  b2RevoluteJoint* joint = (b2RevoluteJoint*)world.CreateJoint(&jd);
+
+  if (link_joint_callback) {
+    link_joint_callback(link, joint);
+  }
+}
+
 int main(int, char**) {
   acg::World world(b2Vec2(0.0f, -10.0f));
 
-  b2Body* ground = NULL;
-  b2Body* link1 = NULL;
-  b2RevoluteJoint* joint1;
+  b2Body* ground = nullptr;
+  b2Body* link1 = nullptr;
+  b2RevoluteJoint* joint1 = nullptr;
+  b2Body* link2 = nullptr;
+  b2RevoluteJoint* joint2 = nullptr;
+
+  // Config
+  const float kGroundLength = 80.0f;
+
+  const float kLink1Length = 10.0f;
+  const float kLink1Width = 0.5f;
+  const b2Vec2 kGroundTJoint1 = {0.0f, 20.0f};
+
+  const float kLink2Length = 10.0f;
+  const float kLink2Width = 0.5f;
+  const b2Vec2 kLink1TJoint2 = b2Vec2(0.0f, kLink1Length);
 
   // Parameters
   bool enable_limit = false;
@@ -23,51 +69,21 @@ int main(int, char**) {
     ground = world.CreateBody(&bd);
 
     b2EdgeShape shape;
-    shape.SetTwoSided(b2Vec2(-40.0f, 0.0f), b2Vec2(40.0f, 0.0f));
+    shape.SetTwoSided(b2Vec2(-kGroundLength / 2, 0.0f), b2Vec2(kGroundLength / 2, 0.0f));
     ground->CreateFixture(acg::FixtureDef().shape(&shape));
   }
 
-  {
-    // Link1
-    b2PolygonShape shape;
-    shape.SetAsBox(0.25f, 5.0f, b2Vec2(0.0f, 5.0f), 0.0f);
+  addLink(world, ground, kGroundTJoint1, kLink1Width, kLink1Length,
+          [&](auto* const& link, auto* const& joint) {
+            link1 = link;
+            joint1 = joint;
+          });
 
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.position.Set(0.0f, 20.0f);
-    link1 = world.CreateBody(&bd);
-    link1->CreateFixture(acg::FixtureDef().shape(&shape).density(5.0f));
-
-    // joint1
-    b2RevoluteJointDef jd;
-    jd.Initialize(ground, link1, b2Vec2(0.0f, 20.0f));
-    jd.motorSpeed = motor_speed;
-    jd.maxMotorTorque = 10000.0f;
-    jd.enableMotor = enable_motor;
-    jd.enableLimit = enable_limit;
-    joint1 = (b2RevoluteJoint*)world.CreateJoint(&jd);
-  }
-
-  {
-    // Link2
-    b2PolygonShape shape;
-    shape.SetAsBox(0.25f, 5.0f, b2Vec2(0.0f, 5.0f), 0.0f);
-
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.position.Set(0.0f, 30.0f);
-    b2Body* body = world.CreateBody(&bd);
-    body->CreateFixture(acg::FixtureDef().shape(&shape).density(5.0f));
-
-    // joint2
-    b2RevoluteJointDef jd;
-    jd.Initialize(link1, body, b2Vec2(0.0f, 30.0f));
-    jd.motorSpeed = motor_speed;
-    jd.maxMotorTorque = 10000.0f;
-    jd.enableMotor = enable_motor;
-    jd.enableLimit = enable_limit;
-    joint1 = (b2RevoluteJoint*)world.CreateJoint(&jd);
-  }
+  addLink(world, link1, kLink1TJoint2, kLink2Width, kLink2Length,
+          [&](auto* const& link, auto* const& joint) {
+            link2 = link;
+            joint2 = joint;
+          });
 
   auto update_ui = [&] {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
