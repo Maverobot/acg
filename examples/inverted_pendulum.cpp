@@ -3,14 +3,19 @@
 #include <acg/fixture_def.h>
 #include <acg/world.h>
 
+#include <NamedType/named_type.hpp>
+
 #include <iostream>
+
+using Width = fluent::NamedType<float, struct WidthTag, fluent::FunctionCallable>;
+using Length = fluent::NamedType<float, struct LengthTag, fluent::FunctionCallable>;
 
 void addLink(
     acg::World& world,
     b2Body* parent,
     b2Vec2 joint_local_pos,
-    float link_width,
-    float link_length,
+    Width link_width,
+    Length link_length,
     std::function<void(b2Body* const&, b2RevoluteJoint* const&)> link_joint_callback = nullptr,
     bool enable_motor = false,
     bool enable_limit = false) {
@@ -50,12 +55,12 @@ int main(int, char**) {
   // Config
   const float kGroundLength = 80.0f;
 
-  const float kLink1Length = 10.0f;
-  const float kLink1Width = 0.5f;
+  const Length kLink1Length{10.0f};
+  const Width kLink1Width{0.5f};
   const b2Vec2 kGroundTJoint1 = {0.0f, 20.0f};
 
-  const float kLink2Length = 10.0f;
-  const float kLink2Width = 0.5f;
+  const Length kLink2Length{10.0f};
+  const Width kLink2Width{0.5f};
   const b2Vec2 kLink1TJoint2 = b2Vec2(0.0f, kLink1Length);
 
   // Parameters
@@ -92,14 +97,17 @@ int main(int, char**) {
 
     if (ImGui::Checkbox("Limit", &enable_limit)) {
       joint1->EnableLimit(enable_limit);
+      joint2->EnableLimit(enable_limit);
     }
 
     if (ImGui::Checkbox("Motor", &enable_motor)) {
       joint1->EnableMotor(enable_motor);
+      joint2->EnableMotor(enable_motor);
     }
 
     if (ImGui::SliderFloat("Speed", &motor_speed, -20.0f, 20.0f, "%.0f")) {
       joint1->SetMotorSpeed(motor_speed);
+      joint2->SetMotorSpeed(motor_speed);
     }
 
     ImGui::End();

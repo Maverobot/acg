@@ -1,0 +1,3 @@
+[submodule "3rdParty/NamedType"]
+	path = 3rdParty/NamedType
+	url = https://github.com/joboccara/NamedType.git
