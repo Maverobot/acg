@@ -57,7 +57,7 @@ int main(int, char**) {
 
   const Length kLink1Length{10.0f};
   const Width kLink1Width{0.5f};
-  const b2Vec2 kGroundTJoint1 = {0.0f, 20.0f};
+  const b2Vec2 kGroundTJoint1 = {0.0f, 22.0f};
 
   const Length kLink2Length{10.0f};
   const Width kLink2Width{0.5f};
