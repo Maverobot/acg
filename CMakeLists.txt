@@ -17,3 +17,4 @@ endmacro()
 
 add_example(falling_circle_with_wind)
 add_example(inverted_pendulum)
+add_example(flying_ball)
