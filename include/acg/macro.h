@@ -16,15 +16,15 @@
   }                                                              \
   T name##_ /* NOLINT */
 
-#define ACG_MEM_ACCESSOR(mem, T, name)                      \
-  auto name(T& new_##name)->decltype(*this) { /* NOLINT */  \
-    this->mem.name = new_##name;                            \
-    return *this;                                           \
-  }                                                         \
-  auto name(T&& new_##name)->decltype(*this) { /* NOLINT */ \
-    this->mem.name = std::move(new_##name);                 \
-    return *this;                                           \
-  }                                                         \
-  const auto& name() const noexcept { /* NOLINT */          \
-    return this->mem.name;                                  \
+#define ACG_MEM_ACCESSOR(mem, T, name)                           \
+  auto name(T const& new_##name)->decltype(*this) { /* NOLINT */ \
+    this->mem.name = new_##name;                                 \
+    return *this;                                                \
+  }                                                              \
+  auto name(T&& new_##name)->decltype(*this) { /* NOLINT */      \
+    this->mem.name = std::move(new_##name);                      \
+    return *this;                                                \
+  }                                                              \
+  const auto& name() const noexcept { /* NOLINT */               \
+    return this->mem.name;                                       \
   }
