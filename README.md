@@ -11,3 +11,7 @@ Execute the following line in the terminal before running the examples
 ```sh
 export MESA_GL_VERSION_OVERRIDE=3.3
 ```
+
+## CHANGELOG
+
+See [CHANGELOG.md](./CHANGELOG.md)
